@@ -1,0 +1,19 @@
+#!/bin/bash
+
+re1='(.*%{.*):(.*}%.*)'
+re2='(.*%{.*)-(.*}%.*)'
+re3='(.*)%{(.*)}%(.*)'
+replaced=${1%.in}
+echo "" > $replaced
+while IFS='' read -r line || [[ -n "$line" ]]; do
+    while [[ $line =~ $re1 ]]; do
+        line=${BASH_REMATCH[1]}_${BASH_REMATCH[2]}
+    done
+    while [[ $line =~ $re2 ]]; do
+        line=${BASH_REMATCH[1]}_${BASH_REMATCH[2]}
+    done
+    while [[ $line =~ $re3 ]]; do
+        line=${BASH_REMATCH[1]}$(eval echo "\$${BASH_REMATCH[2]}")${BASH_REMATCH[3]}
+    done
+    echo $line >> $replaced
+done < "$1"
